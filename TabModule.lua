@@ -13,7 +13,7 @@ function TabModule.new(frame)
     sidebar.Parent = frame
     tabSystem.Sidebar = sidebar
 
-    -- Scrolling list for tabs
+    -- Sidebar layout
     local tabList = Instance.new("UIListLayout")
     tabList.Parent = sidebar
     tabList.SortOrder = Enum.SortOrder.LayoutOrder
@@ -22,7 +22,7 @@ function TabModule.new(frame)
     -- Content container
     local contentContainer = Instance.new("Frame")
     contentContainer.Name = "ContentContainer"
-    contentContainer.Size = UDim2.new(0.75, 0, 1, 0) -- Remaining space
+    contentContainer.Size = UDim2.new(0.75, 0, 1, 0) -- remaining space
     contentContainer.Position = UDim2.new(0.25, 0, 0, 0)
     contentContainer.BackgroundTransparency = 1
     contentContainer.BorderSizePixel = 0
@@ -32,7 +32,7 @@ function TabModule.new(frame)
     tabSystem.Tabs = {}
     tabSystem.ActiveTab = nil
 
-    -- Add tab function
+    -- AddTab
     function tabSystem:AddTab(tabName)
         local button = Instance.new("TextButton")
         button.Size = UDim2.new(1, 0, 0, 40)
@@ -44,7 +44,7 @@ function TabModule.new(frame)
         button.Parent = sidebar
 
         local tabContent = Instance.new("Frame")
-        tabContent.Size = UDim2.new(1, 0, 1, 0) -- fills content container
+        tabContent.Size = UDim2.new(1, 0, 1, 0)
         tabContent.Position = UDim2.new(0, 0, 0, 0)
         tabContent.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         tabContent.BorderSizePixel = 0
@@ -56,12 +56,10 @@ function TabModule.new(frame)
             Content = tabContent
         }
 
-        -- Button click -> switch tabs
         button.MouseButton1Click:Connect(function()
             self:ShowTab(tabName)
         end)
 
-        -- Auto-open first tab
         if not self.ActiveTab then
             self:ShowTab(tabName)
         end
@@ -69,7 +67,7 @@ function TabModule.new(frame)
         return tabContent
     end
 
-    -- ShowTab function
+    -- ShowTab
     function tabSystem:ShowTab(tabName)
         for name, tab in pairs(self.Tabs) do
             tab.Content.Visible = (name == tabName)
