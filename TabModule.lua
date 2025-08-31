@@ -1,73 +1,83 @@
--- ReplicatedStorage.TabModule
 local TabModule = {}
 
--- Create a tab system inside a sidebar
-function TabModule.new(frame: Frame, sidebar: Frame)
+function TabModule.new(frame)
     local tabSystem = {}
-    tabSystem.Frame = frame
+
+    -- Sidebar
+    local sidebar = Instance.new("Frame")
+    sidebar.Name = "Sidebar"
+    sidebar.Size = UDim2.new(0.25, 0, 1, 0) -- 25% of width
+    sidebar.Position = UDim2.new(0, 0, 0, 0)
+    sidebar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    sidebar.BorderSizePixel = 0
+    sidebar.Parent = frame
     tabSystem.Sidebar = sidebar
-    tabSystem.Content = Instance.new("Frame")
+
+    -- Scrolling list for tabs
+    local tabList = Instance.new("UIListLayout")
+    tabList.Parent = sidebar
+    tabList.SortOrder = Enum.SortOrder.LayoutOrder
+    tabSystem.TabList = tabList
 
     -- Content container
-    tabSystem.Content.Size = UDim2.new(1, 0, 1, 0)
-    tabSystem.Content.Position = UDim2.new(0, 0, 0, 0)
-    tabSystem.Content.BackgroundTransparency = 1
-    tabSystem.Content.Parent = frame
+    local contentContainer = Instance.new("Frame")
+    contentContainer.Name = "ContentContainer"
+    contentContainer.Size = UDim2.new(0.75, 0, 1, 0) -- Remaining space
+    contentContainer.Position = UDim2.new(0.25, 0, 0, 0)
+    contentContainer.BackgroundTransparency = 1
+    contentContainer.BorderSizePixel = 0
+    contentContainer.Parent = frame
+    tabSystem.Content = contentContainer
 
-    local layout = Instance.new("UIListLayout")
-    layout.FillDirection = Enum.FillDirection.Vertical
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 6)
-    layout.Parent = sidebar
+    tabSystem.Tabs = {}
+    tabSystem.ActiveTab = nil
 
-    local tabButtons = {}
-    local currentTab = nil
-
-    -- Function to add a new tab
-    function tabSystem:AddTab(name: string)
-        -- Button inside sidebar
+    -- Add tab function
+    function tabSystem:AddTab(tabName)
         local button = Instance.new("TextButton")
-        button.Size = UDim2.new(1, -10, 0, 35)
-        button.Position = UDim2.new(0, 5, 0, 0)
-        button.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
-        button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        button.Font = Enum.Font.SourceSansBold
+        button.Size = UDim2.new(1, 0, 0, 40)
+        button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+        button.Text = tabName
+        button.TextColor3 = Color3.new(1, 1, 1)
+        button.Font = Enum.Font.SourceSans
         button.TextSize = 18
-        button.Text = name
         button.Parent = sidebar
 
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 6)
-        btnCorner.Parent = button
-
-        -- Content frame for this tab
         local tabContent = Instance.new("Frame")
-        tabContent.Size = UDim2.new(1 - sidebar.Size.X.Scale, -sidebar.Size.X.Offset, 1, 0)
-        tabContent.Position = UDim2.new(sidebar.Size.X.Scale, sidebar.Size.X.Offset, 0, 0)
-        tabContent.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
-        tabContent.Visible = false
+        tabContent.Size = UDim2.new(1, 0, 1, 0) -- fills content container
+        tabContent.Position = UDim2.new(0, 0, 0, 0)
+        tabContent.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         tabContent.BorderSizePixel = 0
-        tabContent.Parent = tabSystem.Content
+        tabContent.Visible = false
+        tabContent.Parent = contentContainer
 
-        local contentCorner = Instance.new("UICorner")
-        contentCorner.CornerRadius = UDim.new(0, 12)
-        contentCorner.Parent = tabContent
-
-        -- Button click: switch tab
-        button.MouseButton1Click:Connect(function()
-            if currentTab then
-                currentTab.Visible = false
-            end
-            tabContent.Visible = true
-            currentTab = tabContent
-        end)
-
-        tabButtons[name] = {
+        self.Tabs[tabName] = {
             Button = button,
             Content = tabContent
         }
 
-        return tabContent -- so caller can put stuff inside
+        -- Button click -> switch tabs
+        button.MouseButton1Click:Connect(function()
+            self:ShowTab(tabName)
+        end)
+
+        -- Auto-open first tab
+        if not self.ActiveTab then
+            self:ShowTab(tabName)
+        end
+
+        return tabContent
+    end
+
+    -- ShowTab function
+    function tabSystem:ShowTab(tabName)
+        for name, tab in pairs(self.Tabs) do
+            tab.Content.Visible = (name == tabName)
+            tab.Button.BackgroundColor3 = (name == tabName)
+                and Color3.fromRGB(90, 90, 90)
+                or Color3.fromRGB(70, 70, 70)
+        end
+        self.ActiveTab = tabName
     end
 
     return tabSystem
