@@ -46,7 +46,7 @@ function TabModule.new(frame: Frame, sidebar: Frame)
         tabContent.Position = UDim2.new(sidebar.Size.X.Scale, sidebar.Size.X.Offset, 0, 0)
         tabContent.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
         tabContent.Visible = false
-        tabContent.ZIndex = 1 -- make sure it renders above frame but below sidebar
+        tabContent.BorderSizePixel = 0
         tabContent.Parent = tabSystem.Content
 
         local contentCorner = Instance.new("UICorner")
